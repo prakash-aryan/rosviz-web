@@ -226,4 +226,4 @@ The default rosbridge WebSocket URL (`ws://localhost:9090`) is set in `src/hooks
 
 ## License
 
-MIT
+[MIT](LICENSE)
