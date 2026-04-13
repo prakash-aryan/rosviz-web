@@ -111,14 +111,17 @@ for path in \
 done
 
 if [ -n "$URDF_FILE" ]; then
-    ros2 run robot_state_publisher robot_state_publisher \
-        --ros-args --param use_sim_time:=false -- "$URDF_FILE" &
-    RSP_PID=$!
+    for i in $(seq 0 $((NUM_ROBOTS-1))); do
+        ros2 run robot_state_publisher robot_state_publisher \
+            --ros-args -r __node:=rsp_tb3_$i \
+                       -r __ns:=/tb3_$i \
+                       -p frame_prefix:=tb3_$i/ \
+            -- "$URDF_FILE" &
+    done
     sleep 1
-    echo "  robot_state_publisher running (PID: $RSP_PID)"
+    echo "  $NUM_ROBOTS robot_state_publisher instances running"
 else
     echo "  WARNING: TurtleBot3 URDF not found — 3D model viewer will not work"
-    RSP_PID=""
 fi
 
 # 5. rosbridge WebSocket server
