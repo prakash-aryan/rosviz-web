@@ -79,7 +79,8 @@ for i in $(seq 0 $((NUM_ROBOTS-1))); do
         /tb3_$i/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan \
         /tb3_$i/imu@sensor_msgs/msg/Imu[ignition.msgs.IMU \
         /tb3_$i/camera/image_raw@sensor_msgs/msg/Image[ignition.msgs.Image \
-        /tb3_$i/joint_states@sensor_msgs/msg/JointState[ignition.msgs.Model"
+        /tb3_$i/joint_states@sensor_msgs/msg/JointState[ignition.msgs.Model \
+        /tb3_$i/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked"
 done
 
 ros2 run ros_gz_bridge parameter_bridge $BRIDGE_ARGS &
