@@ -168,10 +168,8 @@ export default function Controls() {
     publishCmd(twist);
   };
   
-  // Handle emergencies
   const handleEmergencyStop = () => {
     stopMovement();
-    // You could also publish to a special emergency topic if available
   };
   
   const handleForceLand = () => {
@@ -191,30 +189,21 @@ export default function Controls() {
     }, 5000);
   };
   
-  // Handle start/pause mission
   const toggleMission = () => {
     if (missionStatus === 'idle' || missionStatus === 'paused') {
       setMissionStatus('active');
-      // Logic to start following waypoints would go here
     } else {
       setMissionStatus('paused');
       stopMovement();
     }
   };
-  
-  // Handle return home
+
   const returnHome = () => {
-    // In a real implementation, this would use position data to navigate back to starting point
-    // For now, we'll just stop movement
     stopMovement();
   };
-  
-  // Custom coordinates navigation
+
   const navigateToCoordinates = () => {
     if (!customLat || !customLng) return;
-    
-    // In a real implementation, this would convert lat/lng to a movement command
-    // For now, just log and clear
     console.log(`Navigating to: ${customLat}, ${customLng}`);
     setCustomLat("");
     setCustomLng("");
