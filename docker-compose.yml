@@ -7,13 +7,17 @@
 #    dashboard   — Next.js dev server (port 3000)
 #
 #  Rendering modes:
-#    No GPU (default):
+#    CPU (default):
 #      docker compose up
-#      → Xvfb software rendering (~5-10 FPS camera)
+#      → Mesa software rendering (llvmpipe). Headless — no Gazebo GUI.
 #
 #    AMD Radeon GPU:
 #      docker compose -f docker-compose.yml -f docker-compose.amdgpu.yml up
-#      → Mesa radeonsi hardware rendering (~30 FPS camera)
+#      → Mesa radeonsi via /dev/dri. Headless — no Gazebo GUI.
+#
+#    NVIDIA GPU (with nvidia-container-toolkit on the host):
+#      docker compose -f docker-compose.yml -f docker-compose.nvidia.yml up
+#      → Full NVIDIA OpenGL + X11 forwarding. Gazebo GUI client works.
 #
 #  Then open http://localhost:3000 in your browser.
 # =============================================================

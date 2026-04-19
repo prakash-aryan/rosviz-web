@@ -1,0 +1,32 @@
+# =============================================================
+#  ROSViz Web — NVIDIA GPU Override
+# =============================================================
+#  Passes the host NVIDIA GPU into the ros-stack container via
+#  the NVIDIA Container Toolkit, plus X11 forwarding so the
+#  Gazebo GUI client can render on the host desktop.
+#
+#  Prerequisites on host:
+#    1. NVIDIA GPU with the proprietary driver installed (`nvidia-smi` works)
+#    2. NVIDIA Container Toolkit 1.14+:
+#       https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+#       After install: `sudo nvidia-ctk runtime configure --runtime=docker && sudo systemctl restart docker`
+#    3. Allow local root clients on X:
+#       xhost +local:root
+#
+#  Usage:
+#    docker compose -f docker-compose.yml -f docker-compose.nvidia.yml up --build
+#
+#  Once rosbridge is up, launch the Gazebo GUI client inside the container:
+#    docker exec -d rosviz-ros bash -c "source /opt/ros/humble/setup.bash && ign gazebo -g"
+# =============================================================
+
+services:
+  ros-stack:
+    runtime: nvidia
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
