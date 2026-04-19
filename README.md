@@ -10,6 +10,39 @@ Single-robot dashboard driving a TurtleBot3 Waffle in Ignition Gazebo Fortress:
 
 ![Single-robot demo](docs/rosviz_singleBot.gif)
 
+## Project status
+
+### Done
+
+- [x] **Dockerized stack.** Single `docker compose up --build` brings up ROS 2 Humble + Gazebo Fortress + rosbridge + the dashboard. CPU, AMD-GPU and NVIDIA-GPU overrides all configured.
+- [x] **Realistic simulated TurtleBot3 Waffle.** Swapped the primitive-shape placeholder visuals for the real STL/DAE meshes (waffle_base, left/right tires, LDS LiDAR) shipped in `ros-humble-turtlebot3-description`.
+- [x] **Intel RealSense D435 sensor.** Replaced the R200 camera mesh with the D435 from `ros-humble-realsense2-description` and added a `depth_camera` sensor beside the RGB one (640×480 @ 30 Hz, 87° HFOV, R_FLOAT32).
+- [x] **Depth pipeline to the browser.** `scripts/image_compressor.py` now colorises the depth stream (turbo colormap, 0.1–5 m window) and publishes it as JPEG alongside the RGB stream — the browser consumes both via rosbridge.
+- [x] **Real-time physics.** Added a `<physics>` block (4 ms step, 250 Hz) so the sim holds ~1.0 real-time factor instead of ~0.46 on a saturated host.
+- [x] **Ground-robot controls.** Remapped the D-pad so ← / → publish `angular.z` (yaw) instead of `linear.y` (strafe), which the differential-drive TurtleBot3 ignores.
+- [x] **Design wireframes.** Four static mockup pages under `/wireframes/…` (Fleet, Common, Robot, Sensor) scaffold the planned redesign — see the `wireframes` branch.
+
+### In progress
+
+- [ ] **Multi-robot simulation — partially done.** `NUM_ROBOTS=3` spawns three TurtleBot3 Waffles via `simulation/models/generate_robots.sh`, each `robot_state_publisher` runs with `frame_prefix:=tb3_<i>/`, and all bridge topics are namespaced `/tb3_<i>/…`. Remaining gaps:
+  - The world file hard-codes three `<include>` entries (`turtlebot3_waffle_0`, `_1`, `_2`). Needs a generated world (or a loop in the entrypoint) so `NUM_ROBOTS` truly drives robot count.
+  - Every robot publishes its TF to its own namespaced `/tb3_<i>/tf` — the recommended ROS 2 multi-robot pattern is shared `/tf` + `frame_prefix`, so a single subscription sees every robot and you can reason about inter-robot transforms in one tree ([Discourse](https://discourse.openrobotics.org/t/tf-tree-in-a-multi-robot-setup-in-ros2/41426), [Stack Exchange](https://answers.ros.org/question/405822/multi-robot-tf-with-namespaces-for-tf-or-with-frame_prefix-what-is-the-right-way-to-do-it-ros2/)). Fix is a remap on the `robot_state_publisher` and `ros_gz_bridge` so `/tb3_<i>/tf` → `/tf`.
+  - The dashboard is still single-robot — see the roadmap below.
+
+### Up next — dashboard catch-up
+
+The ROS side already publishes per-robot namespaced topics, but the dashboard still subscribes to the old single-robot `/odom`, `/camera/image_raw/compressed`, `/imu`, `/cmd_vel`, `/scan`, `/battery_state`, `/tf` names. Priorities, in order:
+
+- [ ] **Remap per-robot TF onto a shared `/tf` tree.** Launch each `robot_state_publisher` with `--ros-args -r /tf:=/tf -r /tf_static:=/tf_static` (or equivalent in the gz bridge) so the dashboard can read every robot's pose from one `/tf` subscription. Requires `frame_prefix` (already set) so frame IDs stay unique.
+- [ ] **Port the wireframes into the real dashboard.** Turn the four static `/wireframes/*` pages into functional routes: `/` → Fleet Overview, `/common`, `/robot/[id]` for the per-robot Dashboard + Sensor tabs.
+- [ ] **Drop UAV-only controls.** Remove the altitude (↑ / ↓ `linear.z`), force-land descent, and any other drone-only buttons from `Controls.tsx` — the TurtleBot3 plugin ignores them anyway.
+- [ ] **Parameterise every component by robot id.** Every `subscribe(...)` / `publish(...)` in `src/components/dashboard/**` should accept a `namespace` prop and prefix topic names with `/tb3_<i>/`. Add a robot-picker to the top bar (matches the wireframe's "Robot Red" label).
+- [ ] **Wire up the Fleet Overview.** Subscribe each robot card to its own `/tb3_<i>/camera/image_raw/compressed`, `/odom`, `/battery_state` and render name / status / battery live.
+- [ ] **Cross-robot panels on the Common tab.** Overlay every robot's position on one 2D map (driven by the shared `/tf` once the remap above lands), merge point clouds (colour-coded per robot), and gate the "Move all Robots" button on valid lat/lon inputs.
+- [ ] **Fill the TBD sensor widgets.** Decide how to render Trajectory History (path plot from `/odom` buffer?) and Velocity Gauge (gauge of `|linear.x|` + `|angular.z|`?).
+- [ ] **Camera feed with object detection.** Run YOLO (or similar) on `/tb3_<i>/camera/image_raw` inside a small ROS node, publish both the annotated JPEG (`.../image_detect/compressed`) and a structured `/camera/detections` topic (class, confidence, bbox). Dashboard adds a "Detection" tile next to RGB + Depth and optionally overlays bbox rectangles on the live feed.
+- [ ] **Alert history backend.** The wireframe shows alerts but nothing produces them yet — need a source (collision / velocity thresholds / connection loss) and a ring-buffer publisher.
+
 ## Features
 
 - **Live Camera Feed** — streaming compressed camera images with HUD telemetry overlay
