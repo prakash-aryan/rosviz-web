@@ -1,0 +1,73 @@
+# =============================================================
+#  ROSViz Web — ROS 2 Humble + Ignition Gazebo Fortress
+# =============================================================
+#  Contains: ROS 2 core, Gazebo Fortress (via ros_gz apt pkgs),
+#  rosbridge_suite, ros_gz_bridge, TurtleBot3, robot_state_publisher,
+#  image_transport, Python opencv/numpy.
+#
+#  Everything comes from apt — no source builds needed.
+# =============================================================
+FROM ros:humble-ros-base-jammy
+
+SHELL ["/bin/bash", "-c"]
+
+# ── Avoid interactive prompts during apt installs ──
+ENV DEBIAN_FRONTEND=noninteractive
+
+# ── Install all ROS / Gazebo packages in one layer ──
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    software-properties-common \
+    && add-apt-repository universe \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+    # ── ros_gz (pulls Ignition Gazebo Fortress as dependency) ──
+    ros-humble-ros-gz-bridge \
+    ros-humble-ros-gz-sim \
+    # ── TurtleBot3 ──
+    ros-humble-turtlebot3 \
+    ros-humble-turtlebot3-bringup \
+    ros-humble-turtlebot3-description \
+    ros-humble-turtlebot3-msgs \
+    ros-humble-turtlebot3-navigation2 \
+    ros-humble-turtlebot3-node \
+    ros-humble-turtlebot3-teleop \
+    # ── Additional ROS packages ──
+    ros-humble-robot-state-publisher \
+    ros-humble-image-transport \
+    ros-humble-rosbridge-suite \
+    ros-humble-xacro \
+    # ── Python ──
+    python3-pip \
+    python3-opencv \
+    python3-numpy \
+    # ── Utilities ──
+    wget curl vim \
+    # ── Mesa ──
+    mesa-utils \
+    mesa-utils-bin \
+    libdrm-amdgpu1 \
+    libdrm-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# ── Working directory ──
+WORKDIR /ros_ws
+
+# ── Copy project simulation files + scripts ──
+COPY simulation/ ./simulation/
+COPY scripts/    ./scripts/
+
+# ── Copy the entrypoint ──
+COPY docker/ros-entrypoint.sh /ros-entrypoint.sh
+RUN chmod +x /ros-entrypoint.sh
+
+# ── Environment ──
+ENV TURTLEBOT3_MODEL=waffle
+ENV ROS_DOMAIN_ID=0
+ENV IGN_GAZEBO_RESOURCE_PATH=/ros_ws/simulation/models
+
+# ── Ports ──
+#  9090  rosbridge WebSocket (browser connects here)
+EXPOSE 9090
+
+ENTRYPOINT ["/ros-entrypoint.sh"]

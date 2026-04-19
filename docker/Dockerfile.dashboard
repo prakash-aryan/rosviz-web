@@ -1,0 +1,30 @@
+# =============================================================
+#  ROSViz Web — Next.js Dashboard
+# =============================================================
+FROM node:20-slim
+
+WORKDIR /app
+
+# ── Install dependencies first (layer caching) ──
+COPY package.json package-lock.json* ./
+RUN npm install
+
+# ── Copy config files (listed explicitly — Docker COPY doesn't
+#    support shell redirects or || true) ──
+COPY tsconfig.json         ./
+COPY next.config.ts        ./
+COPY tailwind.config.ts    ./
+COPY postcss.config.mjs    ./
+COPY eslint.config.mjs     ./
+COPY components.json       ./
+
+# ── Copy application source ──
+COPY public/       ./public/
+COPY src/           ./src/
+
+# ── Port ──
+EXPOSE 3000
+
+# ── Dev server with hot reload ──
+#  Source is mounted as a volume in docker-compose for live editing.
+CMD ["npm", "run", "dev"]

@@ -61,8 +61,10 @@ export function useROS(options: UseROSOptions = {}) {
     messageType: string,
     callback: ROSCallback<T>
   ): (() => void) => {
-    console.log(`Subscribing to ${topic} (${messageType})`);
-    return rosbridge.subscribe<T>(topic, messageType, callback);
+    // modify tb3_n with n between 0-2
+    let improvedTopic = `/tb3_0${topic}`
+    console.log(`Subscribing to ${improvedTopic} (${messageType})`);
+    return rosbridge.subscribe<T>(improvedTopic, messageType, callback);
   }, []);
 
   const publish = useCallback(<T>(
@@ -70,7 +72,9 @@ export function useROS(options: UseROSOptions = {}) {
     messageType: string,
     message: T
   ): boolean => {
-    return rosbridge.publish<T>(topic, messageType, message);
+    // modify tb3_n with n between 0-2
+    let improvedTopic = `/tb3_0${topic}`
+    return rosbridge.publish<T>(improvedTopic, messageType, message);
   }, []);
 
   return {

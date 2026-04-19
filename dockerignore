@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+.next/
+
+# Version control
+.git/
+.gitignore
+
+# Docker (don't recursively copy)
+docker-compose*.yml
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Nix
+shell.nix
+flake.nix
+flake.lock
+.direnv/
+result
+
+# Build artifacts
+*.log
+dist/
+build/

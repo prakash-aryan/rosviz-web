@@ -1,0 +1,69 @@
+# =============================================================
+#  ROSViz Web — Docker Compose
+# =============================================================
+#  Services:
+#    ros-stack   — Gazebo Fortress + ros_gz_bridge + rosbridge +
+#                  robot_state_publisher + image_compressor
+#    dashboard   — Next.js dev server (port 3000)
+#
+#  Rendering modes:
+#    No GPU (default):
+#      docker compose up
+#      → Xvfb software rendering (~5-10 FPS camera)
+#
+#    AMD Radeon GPU:
+#      docker compose -f docker-compose.yml -f docker-compose.amdgpu.yml up
+#      → Mesa radeonsi hardware rendering (~30 FPS camera)
+#
+#  Then open http://localhost:3000 in your browser.
+# =============================================================
+
+services:
+  # ─────────────────────────────────────────────
+  #  ROS 2 + Gazebo Fortress (all-in-one)
+  # ─────────────────────────────────────────────
+  ros-stack:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.ros
+    container_name: rosviz-ros
+    environment:
+      - TURTLEBOT3_MODEL=waffle
+      - ROS_DOMAIN_ID=0
+      - IGN_GAZEBO_RESOURCE_PATH=/ros_ws/simulation/models
+      # Rendering: Xvfb software mode (no GPU needed)
+      - GPU_MODE=none
+    ports:
+      # rosbridge WebSocket — browser connects here
+      - "9090:9090"
+    volumes:
+      # Mount simulation files for easy editing without rebuild
+      - ./simulation:/ros_ws/simulation
+      - ./scripts:/ros_ws/scripts
+    # Increase shared memory for Gazebo / DDS
+    shm_size: '512m'
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  #  Next.js Dashboard
+  # ─────────────────────────────────────────────
+  dashboard:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dashboard
+    container_name: rosviz-dashboard
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount source for hot reload during development
+      - ./src:/app/src
+      - ./public:/app/public
+      # Prevent overwriting container's node_modules
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      # Tell Next.js to accept connections from outside the container
+      - HOSTNAME=0.0.0.0
+    depends_on:
+      - ros-stack
+    restart: unless-stopped

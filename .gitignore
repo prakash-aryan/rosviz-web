@@ -64,3 +64,6 @@ install/
 # Python
 __pycache__/
 *.pyc
+
+# Generated models folders
+simulation/models/turtlebot3_waffle_*

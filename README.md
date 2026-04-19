@@ -25,6 +25,37 @@ A real-time web dashboard for monitoring and controlling ROS 2 robots. Built wit
 - **Bridge:** rosbridge_suite (WebSocket on port 9090)
 - **Browser:** Chromium / Chrome
 
+## Run project with docker
+> It can be interesting to implement the Cuda GPU version
+### Prerequisites
+- Docker and docker compose (v2+)
+- (optional) AMD Radeon GPU with amd GPU kernel drivers. 
+
+### Launch in CPU mode
+```sh
+docker compose up --build
+```
+
+### Launch in AMD-GPU mode (Linux)
+```sh
+# One-time host setup — add your user to the video/render groups
+sudo usermod -aG video,render $USER
+# Log out and back in for group changes to take effect
+
+docker compose -f docker-compose.yml -f docker-compose.amdgpu.yml up --build
+```
+
+### Editing code
+Source folders are bind-mounted into the containers, so you can edit files directly on your host:
+
+- `src/` and `public/` → Next.js hot-reloads automatically
+- `simulation/` and `scripts/` → restart the _ros-stack_ container to pick up changes (`docker compose restart ros-stack` or if AMD-GPU `docker compose -f docker-compose.yml -f docker-compose.amdgpu.yml restart ros-stack` or `ctrl+c` and run again `docker compose up`)
+
+### Shutdown
+```sh
+docker compose down
+```
+
 ## Prerequisites
 
 ### System

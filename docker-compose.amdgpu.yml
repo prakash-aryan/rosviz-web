@@ -1,0 +1,40 @@
+# =============================================================
+#  ROSViz Web — AMD Radeon GPU Override
+# =============================================================
+#  Passes /dev/dri (DRI render nodes) into the container so
+#  Mesa's radeonsi driver can use the AMD GPU for OpenGL.
+#  Camera sensors render at ~30 FPS via hardware acceleration.
+#
+#  Prerequisites on host:
+#    1. AMD Radeon GPU with amdgpu kernel driver loaded:
+#       lsmod | grep amdgpu
+#    2. /dev/dri/renderD128 exists:
+#       ls -l /dev/dri/
+#    3. Current user is in video + render groups:
+#       sudo usermod -aG video,render $USER
+#       (log out and back in after)
+#
+#  Usage:
+#    docker compose -f docker-compose.yml -f docker-compose.amdgpu.yml up
+# =============================================================
+
+services:
+  ros-stack:
+    environment:
+      - GPU_MODE=amd
+      - MESA_LOADER_DRIVER_OVERRIDE=radeonsi   # force radeonsi, no fallback
+      - DRI_PRIME=1                             # force discrete GPU
+      - LIBGL_DRI3_DISABLE=0
+      - EGL_PLATFORM=drm                        # headless EGL via DRM
+      - MESA_GL_VERSION_OVERRIDE=4.5            # prevent capability fallback
+    devices:
+      # DRI render nodes — gives Mesa access to the AMD GPU
+      - /dev/dri:/dev/dri
+    group_add:
+      # Container processes need video + render group access
+      # to use /dev/dri/renderD* and /dev/dri/card*
+      # Need probably to be change to classic group name instead of number
+      - "303"
+      - "26"
+    security_opt:
+      - seccomp:unconfined
