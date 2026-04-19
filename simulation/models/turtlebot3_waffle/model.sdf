@@ -27,7 +27,10 @@
       <visual name="base_visual">
         <pose>-0.064 0 0 0 0 0</pose>
         <geometry>
-          <box><size>0.265 0.265 0.089</size></box>
+          <mesh>
+            <uri>file:///opt/ros/humble/share/turtlebot3_description/meshes/bases/waffle_base.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
         </geometry>
         <material>
           <ambient>0.3 0.3 0.3 1</ambient>
@@ -74,10 +77,15 @@
       </collision>
       <visual name="lidar_visual">
         <pose>-0.064 0 0.121 0 0 0</pose>
-        <geometry><cylinder><radius>0.0508</radius><length>0.055</length></cylinder></geometry>
+        <geometry>
+          <mesh>
+            <uri>file:///opt/ros/humble/share/turtlebot3_description/meshes/sensors/lds.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
         <material>
-          <ambient>0.0 0.8 0.0 1</ambient>
-          <diffuse>0.0 0.8 0.0 1</diffuse>
+          <ambient>0.1 0.1 0.1 1</ambient>
+          <diffuse>0.1 0.1 0.1 1</diffuse>
         </material>
       </visual>
       <sensor name="hls_lfcd_lds" type="gpu_lidar">
@@ -128,8 +136,13 @@
         </surface>
       </collision>
       <visual name="wheel_left_visual">
-        <pose>0.0 0.144 0.023 -1.57 0 0</pose>
-        <geometry><cylinder><radius>0.033</radius><length>0.018</length></cylinder></geometry>
+        <pose>0.0 0.144 0.023 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>file:///opt/ros/humble/share/turtlebot3_description/meshes/wheels/left_tire.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
         <material>
           <ambient>0.1 0.1 0.1 1</ambient>
           <diffuse>0.1 0.1 0.1 1</diffuse>
@@ -155,8 +168,13 @@
         </surface>
       </collision>
       <visual name="wheel_right_visual">
-        <pose>0.0 -0.144 0.023 -1.57 0 0</pose>
-        <geometry><cylinder><radius>0.033</radius><length>0.018</length></cylinder></geometry>
+        <pose>0.0 -0.144 0.023 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>file:///opt/ros/humble/share/turtlebot3_description/meshes/wheels/right_tire.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
         <material>
           <ambient>0.1 0.1 0.1 1</ambient>
           <diffuse>0.1 0.1 0.1 1</diffuse>
@@ -204,28 +222,30 @@
         </inertia>
       </inertial>
       <visual name="camera_visual">
-        <geometry><box><size>0.02 0.08 0.02</size></box></geometry>
-        <material>
-          <ambient>0.0 0.0 0.8 1</ambient>
-          <diffuse>0.0 0.0 0.8 1</diffuse>
-        </material>
+        <pose>0 0 0 1.5708 0 1.5708</pose>
+        <geometry>
+          <mesh>
+            <uri>file:///opt/ros/humble/share/realsense2_description/meshes/d435.dae</uri>
+          </mesh>
+        </geometry>
       </visual>
       <sensor name="camera" type="camera">
+        <pose>0.02 0 0 0 0 0</pose>
         <always_on>true</always_on>
         <visualize>true</visualize>
-        <update_rate>15</update_rate>
+        <update_rate>30</update_rate>
         <topic>camera/image_raw</topic>
         <ignition_frame_id>camera_link</ignition_frame_id>
-        <camera name="tb3_camera">
+        <camera name="rs_color">
           <camera_info_topic>camera/camera_info</camera_info_topic>
-          <horizontal_fov>1.085595</horizontal_fov>
+          <horizontal_fov>1.21126</horizontal_fov>
           <image>
             <width>640</width>
             <height>480</height>
             <format>R8G8B8</format>
           </image>
           <clip>
-            <near>0.03</near>
+            <near>0.02</near>
             <far>100</far>
           </clip>
           <noise>
@@ -233,6 +253,27 @@
             <mean>0.0</mean>
             <stddev>0.007</stddev>
           </noise>
+        </camera>
+      </sensor>
+      <sensor name="depth_camera" type="depth_camera">
+        <pose>0.02 0 0 0 0 0</pose>
+        <always_on>true</always_on>
+        <visualize>false</visualize>
+        <update_rate>30</update_rate>
+        <topic>camera/depth/image_rect_raw</topic>
+        <ignition_frame_id>camera_depth_frame</ignition_frame_id>
+        <camera name="rs_depth">
+          <camera_info_topic>camera/depth/camera_info</camera_info_topic>
+          <horizontal_fov>1.5184</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R_FLOAT32</format>
+          </image>
+          <clip>
+            <near>0.02</near>
+            <far>10.0</far>
+          </clip>
         </camera>
       </sensor>
     </link>

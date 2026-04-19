@@ -52,6 +52,10 @@ ros2 run ros_gz_bridge parameter_bridge \
     /scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan \
     /imu@sensor_msgs/msg/Imu[ignition.msgs.IMU \
     /camera/image_raw@sensor_msgs/msg/Image[ignition.msgs.Image \
+    /camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo \
+    /camera/depth/image_rect_raw@sensor_msgs/msg/Image[ignition.msgs.Image \
+    /camera/depth/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo \
+    /camera/depth/image_rect_raw/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked \
     /joint_states@sensor_msgs/msg/JointState[ignition.msgs.Model \
     /scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked &
 PIDS+=($!)
