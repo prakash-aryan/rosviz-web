@@ -1,6 +1,50 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html, body { height: 100%; }
+}
+
+@layer components {
+  .wireframe-line {
+    @apply bg-muted-foreground/10 inline-block rounded-full;
+  }
+  .wireframe-block {
+    @apply bg-muted-foreground/5 border-muted-foreground/10 rounded-lg border;
+  }
+  .wireframe-emphasis-primary   { @apply bg-muted-foreground/20; }
+  .wireframe-emphasis-secondary { @apply bg-muted-foreground/15; }
+  .wireframe-emphasis-tertiary  { @apply bg-muted-foreground/10; }
+  .wireframe-emphasis-subtle    { @apply bg-muted-foreground/5; }
+
+  .wireframe-x { position: relative; }
+  .wireframe-x::before,
+  .wireframe-x::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .wireframe-x::before {
+    background: linear-gradient(
+      to top right,
+      transparent calc(50% - 0.5px),
+      currentColor calc(50% - 0.5px),
+      currentColor calc(50% + 0.5px),
+      transparent calc(50% + 0.5px)
+    );
+  }
+  .wireframe-x::after {
+    background: linear-gradient(
+      to top left,
+      transparent calc(50% - 0.5px),
+      currentColor calc(50% - 0.5px),
+      currentColor calc(50% + 0.5px),
+      transparent calc(50% + 0.5px)
+    );
+  }
+}
  
 @layer base {
   :root {
