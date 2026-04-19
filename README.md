@@ -4,6 +4,12 @@ A real-time web dashboard for monitoring and controlling ROS 2 robots. Built wit
 
 ![Dashboard](https://img.shields.io/badge/ROS_2-Humble-blue) ![Gazebo](https://img.shields.io/badge/Gazebo-Fortress-orange) ![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04-purple) ![Next.js](https://img.shields.io/badge/Next.js-15-black)
 
+## Demo
+
+Single-robot dashboard driving a TurtleBot3 Waffle in Ignition Gazebo Fortress:
+
+![Single-robot demo](docs/rosviz_singleBot.gif)
+
 ## Features
 
 - **Live Camera Feed** — Streaming compressed camera images with HUD telemetry overlay
