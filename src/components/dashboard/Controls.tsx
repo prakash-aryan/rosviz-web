@@ -156,14 +156,12 @@ export default function Controls() {
     // Linear movement
     if (pressedKeys.current.forward) twist.linear.x = moveSpeed;
     if (pressedKeys.current.backward) twist.linear.x = -moveSpeed;
-    if (pressedKeys.current.left) twist.linear.y = moveSpeed;
-    if (pressedKeys.current.right) twist.linear.y = -moveSpeed;
     if (pressedKeys.current.up) twist.linear.z = moveSpeed;
     if (pressedKeys.current.down) twist.linear.z = -moveSpeed;
-    
-    // Angular movement (rotation)
-    if (pressedKeys.current.turnLeft) twist.angular.z = moveSpeed;
-    if (pressedKeys.current.turnRight) twist.angular.z = -moveSpeed;
+
+    // Angular movement (rotation) — left/right on ground robots maps to yaw, not strafe
+    if (pressedKeys.current.left || pressedKeys.current.turnLeft) twist.angular.z = moveSpeed;
+    if (pressedKeys.current.right || pressedKeys.current.turnRight) twist.angular.z = -moveSpeed;
     
     publishCmd(twist);
   };

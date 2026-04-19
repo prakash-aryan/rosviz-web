@@ -59,12 +59,8 @@ const VideoGrid = () => {
   const [maximizedView, setMaximizedView] = React.useState<number | null>(null);
 
   const views = [
-    { topic: '/camera/image_raw', label: 'RGB Camera 1' },
-    { topic: '/camera/image_raw', label: 'RGB Camera 2' },
-    { topic: '/camera/image_raw', label: 'RGB Camera 3' },
-    { topic: '/camera/image_raw', label: 'RGB Camera 4' },
-    { topic: '/camera/image_raw', label: 'RGB Camera 5' },
-    { topic: '/camera/image_raw', label: 'RGB Camera 6' }
+    { topic: '/camera/image_raw', label: 'RealSense RGB' },
+    { topic: '/camera/depth/image_rect_raw', label: 'RealSense Depth' },
   ];
 
   React.useEffect(() => {
@@ -92,7 +88,7 @@ const VideoGrid = () => {
         </Button>
       </div>
       <div className={`${
-        maximizedView !== null ? '' : 'grid grid-cols-3 grid-rows-2 gap-2'
+        maximizedView !== null ? '' : 'grid grid-cols-2 gap-2'
       } h-[calc(100%-2rem)]`}>
         {views.map((view, index) => (
           maximizedView === null || maximizedView === index ? (
