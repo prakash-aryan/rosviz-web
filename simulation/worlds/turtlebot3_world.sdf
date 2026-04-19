@@ -113,9 +113,16 @@
 
     <!-- TurtleBot3 -->
     <include>
-      <uri>model://turtlebot3_waffle</uri>
+      <uri>model://turtlebot3_waffle_0</uri>
       <pose>0 0 0.01 0 0 0</pose>
     </include>
-
+    <include>
+      <uri>model://turtlebot3_waffle_1</uri>
+      <pose>-1 -1 0.01 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>model://turtlebot3_waffle_2</uri>
+      <pose>1 -1 0.01 0 0 -1.5708</pose>
+    </include>
   </world>
 </sdf>

@@ -36,6 +36,12 @@ sleep 2
 
 WORLD_FILE="$SCRIPT_DIR/worlds/turtlebot3_world.sdf"
 
+
+# 0 Generate robots
+echo "Generating $NUM_ROBOTS robot model folders..."
+bash "$SCRIPT_DIR/models/generate_robots.sh" "$NUM_ROBOTS"
+
+
 # 1. Ignition Gazebo (headless server)
 echo "[1/6] Starting Ignition Gazebo (headless)..."
 ign gazebo -s -r "$WORLD_FILE" &
@@ -48,24 +54,45 @@ if ! kill -0 $IGN_PID 2>/dev/null; then
 fi
 echo "  Ignition Gazebo running (PID: $IGN_PID)"
 
-# 2. ros_gz_bridge
+# 2. ros_gz_bridge - one set of topics per robots
 echo "[2/6] Starting ros_gz_bridge..."
-ros2 run ros_gz_bridge parameter_bridge \
-    /cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist \
-    /odom@nav_msgs/msg/Odometry[ignition.msgs.Odometry \
-    /tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V \
-    /scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan \
-    /imu@sensor_msgs/msg/Imu[ignition.msgs.IMU \
-    /camera/image_raw@sensor_msgs/msg/Image[ignition.msgs.Image \
-    /joint_states@sensor_msgs/msg/JointState[ignition.msgs.Model \
-    /scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked &
+# Command to start the topics for a single robot
+# ros2 run ros_gz_bridge parameter_bridge \
+#     /cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist \
+#     /odom@nav_msgs/msg/Odometry[ignition.msgs.Odometry \
+#     /tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V \
+#     /scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan \
+#     /imu@sensor_msgs/msg/Imu[ignition.msgs.IMU \
+#     /camera/image_raw@sensor_msgs/msg/Image[ignition.msgs.Image \
+#     /joint_states@sensor_msgs/msg/JointState[ignition.msgs.Model \
+#     /scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked &
+# BRIDGE_PID=$!
+
+NUM_ROBOTS=${NUM_ROBOTS:-2}
+
+BRIDGE_ARGS=""
+for i in $(seq 0 $((NUM_ROBOTS-1))); do
+    BRIDGE_ARGS="$BRIDGE_ARGS \
+        /tb3_$i/cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist \
+        /tb3_$i/odom@nav_msgs/msg/Odometry[ignition.msgs.Odometry \
+        /tb3_$i/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V \
+        /tb3_$i/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan \
+        /tb3_$i/imu@sensor_msgs/msg/Imu[ignition.msgs.IMU \
+        /tb3_$i/camera/image_raw@sensor_msgs/msg/Image[ignition.msgs.Image \
+        /tb3_$i/joint_states@sensor_msgs/msg/JointState[ignition.msgs.Model \
+        /tb3_$i/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked"
+done
+
+ros2 run ros_gz_bridge parameter_bridge $BRIDGE_ARGS &
 BRIDGE_PID=$!
+
 sleep 3
 echo "  ros_gz_bridge running (PID: $BRIDGE_PID)"
 
 # 3. Image compressor (raw → JPEG for the browser)
 echo "[3/6] Starting image compressor..."
-python3 "$PROJECT_DIR/scripts/image_compressor.py" &
+# python3 "$PROJECT_DIR/scripts/image_compressor.py" &
+NUM_ROBOTS=$NUM_ROBOTS python3 "$PROJECT_DIR/scripts/image_compressor.py" &
 COMPRESSOR_PID=$!
 sleep 1
 echo "  Image compressor running (PID: $COMPRESSOR_PID)"
@@ -85,14 +112,17 @@ for path in \
 done
 
 if [ -n "$URDF_FILE" ]; then
-    ros2 run robot_state_publisher robot_state_publisher \
-        --ros-args --param use_sim_time:=false -- "$URDF_FILE" &
-    RSP_PID=$!
+    for i in $(seq 0 $((NUM_ROBOTS-1))); do
+        ros2 run robot_state_publisher robot_state_publisher \
+            --ros-args -r __node:=rsp_tb3_$i \
+                       -r __ns:=/tb3_$i \
+                       -p frame_prefix:=tb3_$i/ \
+            -- "$URDF_FILE" &
+    done
     sleep 1
-    echo "  robot_state_publisher running (PID: $RSP_PID)"
+    echo "  $NUM_ROBOTS robot_state_publisher instances running"
 else
     echo "  WARNING: TurtleBot3 URDF not found — 3D model viewer will not work"
-    RSP_PID=""
 fi
 
 # 5. rosbridge WebSocket server
