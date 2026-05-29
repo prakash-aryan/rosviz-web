@@ -33,7 +33,7 @@ export function useDiscoveredRobots(): number[] {
 
     const discover = async () => {
       try {
-        const response = await rosbridge.callService<{}, TopicsResponse>(
+        const response = await rosbridge.callService<Record<string, never>, TopicsResponse>(
           "/rosapi/topics",
           "rosapi/Topics",
           {},

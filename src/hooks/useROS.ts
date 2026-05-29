@@ -58,7 +58,7 @@ export function useROS(options: UseROSOptions = {}) {
       setIsConnecting(true);
       console.log("Attempting to connect to ROS...");
       rosbridge.connect(url).catch((error) => {
-        console.error("ROS connection error:", error);
+        console.warn("ROS connection unavailable:", error);
         setIsConnecting(false);
       });
     }

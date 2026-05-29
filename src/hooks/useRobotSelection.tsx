@@ -85,6 +85,10 @@ export function RobotSelectionProvider({ children }: { children: React.ReactNode
     setIsSwitchingRobot(true);
 
     try {
+      if (!rosbridge.isConnected()) {
+        await rosbridge.connect();
+      }
+
       const results = await Promise.allSettled(
         MUXES.map((mux) =>
           rosbridge.callService(
@@ -123,7 +127,7 @@ export function RobotSelectionProvider({ children }: { children: React.ReactNode
       setSelectedRobotId(id);
       return true;
     } catch (error) {
-      console.error('[useRobotSelection] Unexpected robot switch error', error);
+      console.warn('[useRobotSelection] Robot switch unavailable', error);
       return false;
     } finally {
       if (requestId === requestIdRef.current) {

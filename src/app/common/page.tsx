@@ -50,36 +50,36 @@ export default function CommonPage() {
   return (
     <div className="h-screen w-screen overflow-hidden bg-[#1a1a1a] flex flex-col">
       {/* Top Toolbar */}
-      <div className="w-full h-12 bg-[#232323] flex items-center px-2 gap-1 border-b border-[#333333] shrink-0">
-        <div className="flex items-center gap-1">
+      <div className="w-full min-h-12 bg-[#232323] flex flex-wrap sm:flex-nowrap items-center px-2 py-2 sm:py-0 gap-1 border-b border-[#333333] shrink-0">
+        <div className="flex items-center gap-1 min-w-0">
           <Link href="/">
-            <button className="h-8 px-3 text-sm flex items-center gap-2 rounded text-gray-400 hover:text-white hover:bg-[#2a2a2a] transition-colors">
+            <button className="h-8 px-3 text-sm flex items-center gap-2 rounded text-gray-400 hover:text-white hover:bg-[#2a2a2a] transition-colors whitespace-nowrap">
               <Grid className="w-4 h-4" />
               Fleet Overview
             </button>
           </Link>
           <Link href="/common">
-            <button className="h-8 px-3 text-sm flex items-center gap-2 rounded text-white bg-[#2a2a2a]">
+            <button className="h-8 px-3 text-sm flex items-center gap-2 rounded text-white bg-[#2a2a2a] whitespace-nowrap">
               <Eye className="w-4 h-4" />
               Common
             </button>
           </Link>
         </div>
         <div className="flex-1" />
-        <span className="text-gray-400 text-sm">TurtleBot3 Control System</span>
+        <span className="hidden sm:inline text-gray-400 text-sm">TurtleBot3 Control System</span>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 min-h-0 flex flex-col gap-2 p-4">
+      <div className="flex-1 min-h-0 flex flex-col gap-2 p-3 sm:p-4 overflow-y-auto lg:overflow-hidden">
         {/* Top Row */}
-        <div className="flex gap-2 min-h-0" style={{ flex: "3" }}>
+        <div className="flex flex-col lg:flex-row gap-2 min-h-0 shrink-0 lg:shrink lg:flex-[3]">
           {/* 2D Map */}
-          <div className="flex-[2] min-w-0 min-h-0">
+          <div className="h-72 sm:h-80 lg:h-auto lg:flex-[2] min-w-0 min-h-0">
             <MapView />
           </div>
 
           {/* Point Cloud */}
-          <div className="flex-[1.5] min-w-0 bg-[#1e1e1e] rounded-sm border border-[#333333] flex flex-col p-2">
+          <div className="h-80 lg:h-auto lg:flex-[1.5] min-w-0 bg-[#1e1e1e] rounded-sm border border-[#333333] flex flex-col p-2">
             <span className="text-[#00a5ff] text-sm font-semibold mb-2 shrink-0">Point Cloud</span>
             <div className="flex-1 min-h-0">
               {isConnected ? (
@@ -93,7 +93,7 @@ export default function CommonPage() {
           </div>
 
           {/* Common Controls */}
-          <div className="w-96 shrink-0 bg-[#1e1e1e] rounded-sm border border-[#333333] flex flex-col p-2 gap-2">
+          <div className="w-full lg:w-96 lg:shrink-0 bg-[#1e1e1e] rounded-sm border border-[#333333] flex flex-col p-2 gap-2">
             <span className="text-[#00a5ff] text-sm font-semibold shrink-0">Common Controls</span>
             <div className="flex-1 flex flex-col gap-2">
               {robotIds.length === 0 ? (
@@ -102,7 +102,7 @@ export default function CommonPage() {
                 </div>
               ) : (
                 robotIds.map((id) => (
-                  <div key={id} className="flex items-center gap-1.5">
+                  <div key={id} className="grid grid-cols-[auto_3.5rem_minmax(0,1fr)_minmax(0,1fr)] items-center gap-1.5">
                     <div
                       className="w-2 h-2 rounded-full shrink-0"
                       style={{ backgroundColor: getRobotColor(id) }}
@@ -113,14 +113,14 @@ export default function CommonPage() {
                       placeholder="Lat"
                       value={coords[id]?.lat ?? ""}
                       onChange={(e) => handleCoordChange(id, "lat", e.target.value)}
-                      className="w-0 flex-1 h-7 bg-[#2a2a2a] border border-[#333333] rounded px-2 text-xs text-gray-300 placeholder-gray-600 focus:outline-none focus:border-[#00a5ff]"
+                      className="w-full min-w-0 h-7 bg-[#2a2a2a] border border-[#333333] rounded px-2 text-xs text-gray-300 placeholder-gray-600 focus:outline-none focus:border-[#00a5ff]"
                     />
                     <input
                       type="text"
                       placeholder="Lon"
                       value={coords[id]?.lon ?? ""}
                       onChange={(e) => handleCoordChange(id, "lon", e.target.value)}
-                      className="w-0 flex-1 h-7 bg-[#2a2a2a] border border-[#333333] rounded px-2 text-xs text-gray-300 placeholder-gray-600 focus:outline-none focus:border-[#00a5ff]"
+                      className="w-full min-w-0 h-7 bg-[#2a2a2a] border border-[#333333] rounded px-2 text-xs text-gray-300 placeholder-gray-600 focus:outline-none focus:border-[#00a5ff]"
                     />
                   </div>
                 ))
@@ -136,7 +136,7 @@ export default function CommonPage() {
         </div>
 
         {/* Alerts Row */}
-        <div className="shrink-0 h-56 min-h-0 overflow-hidden">
+        <div className="shrink-0 h-72 lg:h-56 min-h-0 overflow-hidden">
           <AlertHistory />
         </div>
       </div>
